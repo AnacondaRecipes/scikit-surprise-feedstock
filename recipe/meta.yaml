@@ -51,16 +51,19 @@ test:
     - surprise -h
 
 about:
-  home: http://surpriselib.com
+  home: https://surpriselib.com
   license: BSD-3-Clause
   license_family: BSD
   license_file: LICENSE.md
   summary: A Python scikit for building and analyzing recommender systems.
   description: |
     Surprise is a Python scikit for building and analyzing recommender systems that deal with explicit rating data.
-  doc_url: http://surprise.readthedocs.io/en/stable/
+  doc_url: https://surprise.readthedocs.io/en/stable/
   dev_url: https://github.com/NicolasHug/Surprise
 
 extra:
   recipe-maintainers:
     - NicolasHug
+  skip-lints:
+    - python_build_tool_in_run
+    - host_section_needs_exact_pinnings
