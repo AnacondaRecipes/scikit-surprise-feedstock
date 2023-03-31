@@ -1,34 +1,41 @@
 {% set name = "scikit-surprise" %}
 {% set version = "1.1.3" %}
-{% set sha256 = "56bfec410b21278807b7538acb7405db99b44937259dd329762cee7e667d4bcc" %}
+{% set numpy = "1.19.5" %}  # [py<=39 and not (osx and arm64)]
+{% set numpy = "1.21" %}  # [py<=39 and (osx and arm64)]
+{% set numpy = "1.21" %}  # [py>39 and py<311]
+{% set numpy = "1.23" %}  # [py>=311]
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  fn: {{ name }}-{{ version }}.tar.gz
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: {{ sha256 }}
+  sha256: 56bfec410b21278807b7538acb7405db99b44937259dd329762cee7e667d4bcc
 
 build:
-  number: 1
-  script: python setup.py install --single-version-externally-managed --record record.txt
-
+  number: 0
+  skip: true  # [py<38]
+  script: {{ PYTHON }} -m pip install . --no-deps -vv
+  entry_points:
+    - surprise = surprise.__main__:main
 requirements:
   build:
     - {{ compiler('c') }}
   host:
     - python
-    - setuptools
+    - pip
     - cython
-    - numpy
-  run:
+    - numpy {{ numpy }}
     - setuptools
+    - wheel
+  run:
     - python
-    - {{ pin_compatible('numpy') }}
-    - joblib
-    - scipy
+    - numpy >={{ numpy }},<1.27.0
+    - joblib >=1.0.0
+    - scipy >=1.3.2
+    # pkg_resources from setuptools is used here https://github.com/NicolasHug/Surprise/blob/v1.1.3/surprise/__init__.py#L1
+    - setuptools
 
 test:
   imports:
@@ -37,15 +44,20 @@ test:
     - surprise.similarities
     - surprise.dataset
     - surprise.model_selection
+  requires:
+    - pip
+  commands:
+    - pip check
+    - surprise -h
 
 about:
   home: http://surpriselib.com
   license: BSD-3-Clause
   license_family: BSD
   license_file: LICENSE.md
-  summary: 'A Python scikit for building and analyzing recommender systems.'
-
-  description:
+  summary: A Python scikit for building and analyzing recommender systems.
+  description: |
+    Surprise is a Python scikit for building and analyzing recommender systems that deal with explicit rating data.
   doc_url: http://surprise.readthedocs.io/en/stable/
   dev_url: https://github.com/NicolasHug/Surprise
 
